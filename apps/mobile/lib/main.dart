@@ -1,17 +1,14 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'features/attendance/presentation/attendance_screen.dart';
+import 'features/auth/presentation/login_screen.dart';
+
+// import 'features/attendance/presentation/attendance_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(
-    const ProviderScope(
-      child: EstateTrackApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: EstateTrackApp()));
 }
 
 class EstateTrackApp extends StatelessWidget {
@@ -23,12 +20,10 @@ class EstateTrackApp extends StatelessWidget {
       title: 'EstateTrack',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1B5E42),
-        ),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF12633B)),
         useMaterial3: true,
       ),
-      home: const AttendanceScreen(),
+      home: const LoginScreen(),
     );
   }
 }
