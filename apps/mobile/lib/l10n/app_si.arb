@@ -1,0 +1,27 @@
+
+{
+  "@@locale": "si",
+  "appName": "EstateTrack",
+  "appSubtitle": "ස්මාර්ට් වැවිලි කළමනාකරණ පද්ධතිය",
+  "localStorage": "දේශීය දත්ත ගබඩාව සක්‍රීයයි",
+  "regionName": "නුවරඑළිය ප්‍රාදේශීය වැවිලි",
+  "fieldMode": "ක්ෂේත්‍ර මාදිලිය සක්‍රීයයි",
+  "offlineMessage": "අන්තර්ජාල සම්බන්ධතාවක් නොමැතිව ඔබගේ සුරැකි අධීක්ෂක PIN අංකය භාවිතයෙන් පිවිසිය හැක.",
+  "username": "පරිශීලක නාමය හෝ ක්ෂේත්‍ර අධීක්ෂක හැඳුනුම් අංකය",
+  "pin": "මුරපදය / PIN",
+  "pinHint": "ඉලක්කම් 4-6ක PIN අංකය ඇතුළත් කරන්න",
+  "secureVault": "ආරක්ෂිත දේශීය ගබඩාවේ සුරකින ලදී",
+  "resetPin": "PIN අංකය යළි සකසන්න",
+  "assignedDivision": "පවරා ඇති සේවක අංශය",
+  "upperDivision": "ඉහළ අංශය #04",
+  "valleyDivision": "නිම්නය බටහිර #02",
+  "login": "ESTATETRACK වෙත පිවිසෙන්න",
+  "bluetoothScales": "බ්ලූටූත් තරාදි",
+  "connectionNotChecked": "සම්බන්ධතාව පරීක්ෂා කර නැත",
+  "helpline": "වතු කාර්යාල උපකාරක සේවාව",
+  "developmentPreview": "EstateTrack • සංවර්ධන පෙරදසුන",
+  "usernameRequired": "අධීක්ෂක හැඳුනුම් අංකය ඇතුළත් කරන්න",
+  "pinInvalid": "වලංගු ඉලක්කම් 4-6ක PIN අංකයක් ඇතුළත් කරන්න",
+  "loginDemo": "පිවිසුම් අතුරුමුහුණත සූදානම්. සත්‍යාපනය සම්බන්ධ කළ යුතුය.",
+  "pinResetUnavailable": "PIN යළි සැකසීම තවම සම්බන්ධ කර නැත."
+}
