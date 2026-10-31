@@ -35,6 +35,12 @@ class AppLocalizationsSi extends AppLocalizations {
   String get pin => 'මුරපදය / PIN';
 
   @override
+  String get showPin => 'PIN අංකය පෙන්වන්න';
+
+  @override
+  String get hidePin => 'PIN අංකය සඟවන්න';
+
+  @override
   String get pinHint => 'ඉලක්කම් 4-6ක PIN අංකය ඇතුළත් කරන්න';
 
   @override

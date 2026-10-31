@@ -9,6 +9,8 @@
   "offlineMessage": "Offline-ready: Sign in with your saved supervisor PIN without internet connectivity.",
   "username": "Username or Field Supervisor ID",
   "pin": "Password / PIN",
+  "showPin": "Show PIN",
+  "hidePin": "Hide PIN",
   "pinHint": "Enter 4-6 digit PIN",
   "secureVault": "Stored in secure offline vault",
   "resetPin": "Quick PIN Reset",

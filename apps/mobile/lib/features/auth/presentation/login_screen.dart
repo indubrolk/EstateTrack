@@ -1,6 +1,7 @@
+import 'package:flutter/material.dart';
+
 import '../../../core/localization/locale_controller.dart';
 import '../../../l10n/app_localizations.dart';
-import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, this.onLogin});
@@ -17,13 +18,27 @@ class _LoginScreenState extends State<LoginScreen> {
   final _pinController = TextEditingController();
 
   bool _showPin = false;
-  String _language = 'English';
-  String _division = 'Upper Div #04';
+  bool _submitted = false;
+  String _division = 'upper';
+  Locale? _lastLocale;
 
   static const green = Color(0xFF12633B);
   static const dark = Color(0xFF142338);
   static const background = Color(0xFFF7F9FF);
   static const fieldBackground = Color(0xFFEDF2FE);
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final locale = Localizations.localeOf(context);
+    if (_submitted && _lastLocale != locale) {
+      // Wait until the fields have received their translated validators.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _formKey.currentState?.validate();
+      });
+    }
+    _lastLocale = locale;
+  }
 
   @override
   void dispose() {
@@ -33,6 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _login() {
+    setState(() => _submitted = true);
     if (!_formKey.currentState!.validate()) return;
 
     // UI demo only. No real authentication yet.
@@ -40,9 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
       widget.onLogin!();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Login UI ready. Connect authentication next.'),
-        ),
+        SnackBar(content: Text(AppLocalizations.of(context)!.loginDemo)),
       );
     }
   }
@@ -73,30 +87,35 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _languageButton(String language) {
-    final selected = _language == language;
+  Widget _languageButton(String code, String language) {
+    final selected = Localizations.localeOf(context).languageCode == code;
 
     return Expanded(
-      child: InkWell(
-        onTap: () {
-          setState(() => _language = language);
-        },
-        borderRadius: BorderRadius.circular(15),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 3),
-          decoration: BoxDecoration(
-            color: selected ? green : Colors.transparent,
+      child: Semantics(
+        selected: selected,
+        button: true,
+        child: Material(
+          color: selected ? green : Colors.transparent,
+          animationDuration: const Duration(milliseconds: 220),
+          borderRadius: BorderRadius.circular(15),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            key: ValueKey('language-$code'),
+            onTap: () {
+              changeLanguage(code);
+            },
             borderRadius: BorderRadius.circular(15),
-          ),
-          child: Text(
-            language,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: selected ? FontWeight.bold : FontWeight.w500,
-              color: selected ? Colors.white : dark,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 3),
+              child: Text(
+                language,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: selected ? FontWeight.bold : FontWeight.w500,
+                  color: selected ? Colors.white : dark,
+                ),
+              ),
             ),
           ),
         ),
@@ -104,44 +123,49 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _divisionButton(String division) {
+  Widget _divisionButton(String division, String label) {
     final selected = _division == division;
 
     return Expanded(
-      child: InkWell(
-        onTap: () => setState(() {
-          _division = division;
-        }),
-        borderRadius: BorderRadius.circular(16),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOutCubic,
-          height: 62,
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(
-            color: selected ? const Color(0xFFE1F1E8) : fieldBackground,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  division,
-                  style: TextStyle(
-                    color: selected ? green : dark,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
+      child: Semantics(
+        selected: selected,
+        button: true,
+        child: InkWell(
+          key: ValueKey('division-$division'),
+          onTap: () => setState(() {
+            _division = division;
+          }),
+          borderRadius: BorderRadius.circular(16),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOutCubic,
+            constraints: const BoxConstraints(minHeight: 72),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+            decoration: BoxDecoration(
+              color: selected ? const Color(0xFFE1F1E8) : fieldBackground,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: selected ? green : dark,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
                   ),
                 ),
-              ),
-              Icon(
-                selected
-                    ? Icons.check_circle_outline
-                    : Icons.radio_button_unchecked,
-                color: selected ? green : Colors.grey,
-                size: 21,
-              ),
-            ],
+                Icon(
+                  selected
+                      ? Icons.check_circle_outline
+                      : Icons.radio_button_unchecked,
+                  color: selected ? green : Colors.grey,
+                  size: 21,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -150,6 +174,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: background,
       body: SafeArea(
@@ -161,63 +186,52 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Top status and language selection
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 4,
-                        child: Container(
-                          height: 48,
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFCDEAD9),
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: const Row(
-                            children: [
-                              Icon(
-                                Icons.cloud_done_outlined,
-                                color: green,
-                                size: 21,
-                              ),
-                              SizedBox(width: 7),
-                              Expanded(
-                                child: Text(
-                                  'LOCAL STORAGE\nACTIVE',
-                                  style: TextStyle(
-                                    color: Color(0xFF416853),
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                              ),
-                            ],
+                  // Give each language enough room for its native script.
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFCDEAD9),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.cloud_done_outlined,
+                          color: green,
+                          size: 21,
+                        ),
+                        const SizedBox(width: 9),
+                        Expanded(
+                          child: Text(
+                            l10n.localStorage,
+                            style: const TextStyle(
+                              color: Color(0xFF416853),
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        flex: 6,
-                        child: Container(
-                          height: 48,
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFDEE9FE),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Row(
-                            children: [
-                              _languageButton('English'),
-                              _languageButton('සිංහල'),
-                              _languageButton('தமிழ்'),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFDEE9FE),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      children: [
+                        _languageButton('en', 'English'),
+                        _languageButton('si', 'සිංහල'),
+                        _languageButton('ta', 'தமிழ்'),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 32),
 
                   // EstateTrack logo
@@ -236,13 +250,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ],
                       ),
-                      child: const Column(
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.eco, size: 52, color: green),
+                          const Icon(Icons.eco, size: 52, color: green),
                           Text(
-                            'EstateTrack',
-                            style: TextStyle(
+                            l10n.appName,
+                            style: const TextStyle(
                               fontWeight: FontWeight.w800,
                               fontSize: 12,
                               color: green,
@@ -255,10 +269,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 16),
 
-                  const Text(
-                    'EstateTrack',
+                  Text(
+                    l10n.appName,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 35,
                       fontWeight: FontWeight.w900,
                       color: dark,
@@ -268,10 +282,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 3),
 
-                  const Text(
-                    'Smart Plantation Management System',
+                  Text(
+                    l10n.appSubtitle,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                       color: Color(0xFF465148),
@@ -289,16 +303,20 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: const Color(0xFFE6EDFF),
                       borderRadius: BorderRadius.circular(25),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.landscape_outlined, color: green, size: 20),
-                        SizedBox(width: 8),
+                        const Icon(
+                          Icons.landscape_outlined,
+                          color: green,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
                         Flexible(
                           child: Text(
-                            'Nuwara Eliya Regional Plantations',
+                            l10n.regionName,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: green,
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -318,31 +336,31 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: const Color(0xFFFFDDB6),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Row(
+                    child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.cloud_off_outlined,
                           color: Color(0xFF70450B),
                           size: 24,
                         ),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Field Mode Enabled',
-                                style: TextStyle(
+                                l10n.fieldMode,
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFF34210C),
                                 ),
                               ),
-                              SizedBox(height: 5),
+                              const SizedBox(height: 5),
                               Text(
-                                'Offline-ready: Sign in with your saved supervisor PIN without internet connectivity.',
-                                style: TextStyle(
+                                l10n.offlineMessage,
+                                style: const TextStyle(
                                   height: 1.5,
                                   fontSize: 13,
                                   color: Color(0xFF684009),
@@ -373,15 +391,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: Form(
                       key: _formKey,
+                      autovalidateMode: _submitted
+                          ? AutovalidateMode.always
+                          : AutovalidateMode.disabled,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          _sectionLabel(
-                            Icons.badge_outlined,
-                            'Username or Field Supervisor ID',
-                          ),
+                          _sectionLabel(Icons.badge_outlined, l10n.username),
                           const SizedBox(height: 8),
                           TextFormField(
+                            key: const ValueKey('username'),
                             controller: _usernameController,
                             style: const TextStyle(
                               fontSize: 19,
@@ -389,6 +408,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: dark,
                             ),
                             decoration: InputDecoration(
+                              errorMaxLines: 3,
                               filled: true,
                               fillColor: fieldBackground,
                               contentPadding: const EdgeInsets.symmetric(
@@ -413,7 +433,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
-                                return 'Enter your supervisor ID';
+                                return l10n.usernameRequired;
                               }
                               return null;
                             },
@@ -421,9 +441,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           const SizedBox(height: 20),
 
-                          _sectionLabel(Icons.key_outlined, 'Password / PIN'),
+                          _sectionLabel(Icons.key_outlined, l10n.pin),
                           const SizedBox(height: 8),
                           TextFormField(
+                            key: const ValueKey('pin'),
                             controller: _pinController,
                             obscureText: !_showPin,
                             keyboardType: TextInputType.number,
@@ -435,12 +456,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             decoration: InputDecoration(
                               counterText: '',
-                              hintText: 'Enter 4-6 digit PIN',
+                              hintText: l10n.pinHint,
+                              hintMaxLines: 2,
                               hintStyle: const TextStyle(
                                 color: Color(0xFFABB6AA),
                                 fontSize: 14,
                                 letterSpacing: 1,
                               ),
+                              errorMaxLines: 3,
                               filled: true,
                               fillColor: fieldBackground,
                               contentPadding: const EdgeInsets.symmetric(
@@ -460,6 +483,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 1.5,
                               ),
                               suffixIcon: IconButton(
+                                tooltip: _showPin ? l10n.hidePin : l10n.showPin,
                                 onPressed: () {
                                   setState(() {
                                     _showPin = !_showPin;
@@ -475,7 +499,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             validator: (value) {
                               if (value == null ||
                                   !RegExp(r'^\d{4,6}$').hasMatch(value)) {
-                                return 'Enter a valid 4-6 digit PIN';
+                                return l10n.pinInvalid;
                               }
                               return null;
                             },
@@ -483,31 +507,27 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           const SizedBox(height: 12),
 
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Flexible(
-                                child: Text(
-                                  'Stored in secure offline vault',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: Colors.grey,
-                                  ),
+                              Text(
+                                l10n.secureVault,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey,
                                 ),
                               ),
                               TextButton(
                                 onPressed: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        'PIN reset is not connected yet.',
-                                      ),
+                                    SnackBar(
+                                      content: Text(l10n.pinResetUnavailable),
                                     ),
                                   );
                                 },
-                                child: const Text(
-                                  'Quick PIN Reset',
-                                  style: TextStyle(
+                                child: Text(
+                                  l10n.resetPin,
+                                  style: const TextStyle(
                                     color: green,
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
@@ -521,32 +541,33 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           _sectionLabel(
                             Icons.hub_outlined,
-                            'Assigned Muster Division',
+                            l10n.assignedDivision,
                           ),
 
                           const SizedBox(height: 10),
 
                           Row(
                             children: [
-                              _divisionButton('Upper Div #04'),
+                              _divisionButton('upper', l10n.upperDivision),
                               const SizedBox(width: 9),
-                              _divisionButton('Valley West #02'),
+                              _divisionButton('valley', l10n.valleyDivision),
                             ],
                           ),
 
                           const SizedBox(height: 24),
 
-                          SizedBox(
-                            height: 65,
+                          ConstrainedBox(
+                            constraints: const BoxConstraints(minHeight: 65),
                             child: ElevatedButton.icon(
                               onPressed: _login,
                               icon: const Icon(
                                 Icons.login,
                                 color: Colors.white,
                               ),
-                              label: const Text(
-                                'LOGIN TO ESTATETRACK',
-                                style: TextStyle(
+                              label: Text(
+                                l10n.login,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
@@ -554,6 +575,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                               style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 18,
+                                ),
                                 backgroundColor: green,
                                 foregroundColor: Colors.white,
                                 elevation: 0,
@@ -595,21 +620,21 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Bluetooth Scales',
-                                style: TextStyle(
+                                l10n.bluetoothScales,
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
                                   color: dark,
                                 ),
                               ),
                               Text(
-                                'Connection not checked',
-                                style: TextStyle(
+                                l10n.connectionNotChecked,
+                                style: const TextStyle(
                                   fontSize: 12,
                                   color: Color(0xFF546056),
                                 ),
@@ -624,18 +649,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 26),
 
-                  const Text(
-                    'Estate Office Helpline',
+                  Text(
+                    l10n.helpline,
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Color(0xFF566157), fontSize: 13),
+                    style: const TextStyle(
+                      color: Color(0xFF566157),
+                      fontSize: 13,
+                    ),
                   ),
 
                   const SizedBox(height: 8),
 
-                  const Text(
-                    'EstateTrack • Development Preview',
+                  Text(
+                    l10n.developmentPreview,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.grey,
                       fontSize: 11,
                       letterSpacing: 1,

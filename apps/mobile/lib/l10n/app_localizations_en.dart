@@ -35,6 +35,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pin => 'Password / PIN';
 
   @override
+  String get showPin => 'Show PIN';
+
+  @override
+  String get hidePin => 'Hide PIN';
+
+  @override
   String get pinHint => 'Enter 4-6 digit PIN';
 
   @override

@@ -35,6 +35,12 @@ class AppLocalizationsTa extends AppLocalizations {
   String get pin => 'கடவுச்சொல் / PIN';
 
   @override
+  String get showPin => 'PIN எண்ணைக் காட்டு';
+
+  @override
+  String get hidePin => 'PIN எண்ணை மறை';
+
+  @override
   String get pinHint => '4-6 இலக்க PIN எண்ணை உள்ளிடவும்';
 
   @override

@@ -148,6 +148,18 @@ abstract class AppLocalizations {
   /// **'Password / PIN'**
   String get pin;
 
+  /// No description provided for @showPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Show PIN'**
+  String get showPin;
+
+  /// No description provided for @hidePin.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide PIN'**
+  String get hidePin;
+
   /// No description provided for @pinHint.
   ///
   /// In en, this message translates to:

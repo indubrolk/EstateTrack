@@ -1,7 +1,5 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
 // Localization
 import 'core/localization/locale_controller.dart';
@@ -15,11 +13,7 @@ import 'features/auth/presentation/login_screen.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(
-    const ProviderScope(
-      child: EstateTrackApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: EstateTrackApp()));
 }
 
 class EstateTrackApp extends StatelessWidget {
@@ -31,26 +25,17 @@ class EstateTrackApp extends StatelessWidget {
       valueListenable: appLocale,
       builder: (context, selectedLocale, child) {
         return MaterialApp(
-          title: 'EstateTrack',
+          onGenerateTitle: (context) => AppLocalizations.of(context)!.appName,
           debugShowCheckedModeBanner: false,
 
           // Current selected language
           locale: selectedLocale,
 
           // Supported languages
-          supportedLocales: const [
-            Locale('en'), // English
-            Locale('si'), // Sinhala
-            Locale('ta'), // Tamil
-          ],
+          supportedLocales: AppLocalizations.supportedLocales,
 
           // Localization delegates
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
 
           // Theme
           theme: ThemeData(
