@@ -1,0 +1,89 @@
+
+name: EstateTrack Flutter CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - "apps/mobile/**"
+      - ".github/workflows/flutter-ci.yml"
+
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - "apps/mobile/**"
+      - ".github/workflows/flutter-ci.yml"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: flutter-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  flutter-check:
+    name: Analyze and Build Flutter
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: apps/mobile
+
+    steps:
+      # Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      # Install Java for Android builds
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      # Install Flutter SDK
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      # Verify Flutter installation
+      - name: Flutter version
+        run: flutter --version
+
+      # Install dependencies
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Generate localization files
+      - name: Generate localization files
+        run: flutter gen-l10n
+
+      # Flutter static analysis
+      - name: Static analysis
+        run: flutter analyze
+
+      # Enable when widget tests are ready
+      # - name: Run Flutter tests
+      #   run: flutter test
+
+      # Build Android debug APK
+      - name: Build Android debug APK
+        run: flutter build apk --debug
+
+      # Upload APK to GitHub Actions artifacts
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: EstateTrack-Android-Debug
+          path: apps/mobile/build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 14
+          if-no-files-found: error

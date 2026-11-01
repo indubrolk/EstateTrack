@@ -7,6 +7,7 @@ import 'l10n/app_localizations.dart';
 
 // Screens
 import 'features/auth/presentation/login_screen.dart';
+import 'features/home/presentation/home_screen.dart';
 
 // import 'features/attendance/presentation/attendance_screen.dart';
 
@@ -16,8 +17,15 @@ void main() {
   runApp(const ProviderScope(child: EstateTrackApp()));
 }
 
-class EstateTrackApp extends StatelessWidget {
+class EstateTrackApp extends StatefulWidget {
   const EstateTrackApp({super.key});
+
+  @override
+  State<EstateTrackApp> createState() => _EstateTrackAppState();
+}
+
+class _EstateTrackAppState extends State<EstateTrackApp> {
+  bool _isLoggedIn = false;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +54,15 @@ class EstateTrackApp extends StatelessWidget {
           ),
 
           // First screen
-          home: const LoginScreen(),
+          home: _isLoggedIn
+              ? const HomeScreen()
+              : LoginScreen(
+                  onLogin: () {
+                    setState(() {
+                      _isLoggedIn = true;
+                    });
+                  },
+                ),
         );
       },
     );
