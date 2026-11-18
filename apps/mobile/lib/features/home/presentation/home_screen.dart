@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../attendance/presentation/attendance_screen.dart';
+import '../../workers/presentation/workers_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -720,7 +721,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final pages = <Widget>[
       _homeContent(),
       const AttendanceScreen(),
-      _placeholder('Workers'),
+      WorkersScreen(onMarkAttendance: () => _selectTab(1)),
       _placeholder('Profile'),
     ];
 

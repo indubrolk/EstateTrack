@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 // Localization
 import 'core/localization/locale_controller.dart';
@@ -13,6 +15,13 @@ import 'features/home/presentation/home_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (!kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.windows ||
+          defaultTargetPlatform == TargetPlatform.linux)) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
 
   runApp(const ProviderScope(child: EstateTrackApp()));
 }
