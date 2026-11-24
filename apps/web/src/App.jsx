@@ -1,122 +1,78 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { Component } from 'react'
+import Workspace from '../components/Workspace'
+import Overview from '../components/Overview'
+import Fieldwork, { FieldEntry } from '../components/Fieldwork'
+import { Payroll, Reports } from '../components/Finance'
+import {
+  DatePicker,
+  Modal,
+  Field,
+  Pill,
+  Empty,
+  DownloadButton,
+} from '../components/UI'
+
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props)
+    this.state = { hasError: false, error: null }
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error }
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error("App error boundary caught:", error, errorInfo)
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '40px', fontFamily: 'sans-serif', maxWidth: '640px', margin: '40px auto', background: '#fff', border: '1px solid #dee3da', borderRadius: '12px' }}>
+          <h2 style={{ color: '#222d26', marginBottom: '8px' }}>Something went wrong loading EstateTrack</h2>
+          <p style={{ color: '#69736c', fontSize: '13px', marginBottom: '16px' }}>An error occurred while rendering the workspace.</p>
+          <pre style={{ background: '#fbf4f2', padding: '12px', borderRadius: '6px', color: '#97492f', fontSize: '12px', overflow: 'auto' }}>
+            {this.state.error?.message || String(this.state.error)}
+          </pre>
+          <button
+            onClick={() => {
+              try {
+                localStorage.clear()
+              } catch {
+                // ignore
+              }
+              window.location.reload()
+            }}
+            style={{ marginTop: '16px', padding: '10px 18px', background: '#205e43', color: '#fff', border: 0, borderRadius: '7px', cursor: 'pointer', fontWeight: 600 }}
+          >
+            Reset Workspace Data & Reload
+          </button>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <ErrorBoundary>
+      <Workspace />
+    </ErrorBoundary>
   )
+}
+
+export {
+  Workspace,
+  Overview,
+  Fieldwork,
+  FieldEntry,
+  Payroll,
+  Reports,
+  DatePicker,
+  Modal,
+  Field,
+  Pill,
+  Empty,
+  DownloadButton,
 }
 
 export default App
